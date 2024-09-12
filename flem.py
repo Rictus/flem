@@ -34,7 +34,7 @@ def ask_gpt_to_fix_command(command):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
+        "Authorization": f"Bearer {os.environ['FLEM_OPENAI_API_KEY']}"
     }
     data = {
         "model": "gpt-3.5-turbo",

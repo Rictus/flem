@@ -17,7 +17,7 @@ FLEM is a command-line tool that helps fix bash commands. It retrieves the last 
  
 2. Set up your OpenAI API key as an environment variable:
    ```
-   export OPENAI_API_KEY='your-api-key-here'
+   export FLEM_OPENAI_API_KEY='your-api-key-here'
    ```
 
 ## Usage
