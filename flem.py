@@ -30,16 +30,16 @@ def get_last_command_from_history():
     last_command = subprocess.getoutput('tail -n 3 ~/.bash_history | head -n 1 ').strip()
     return last_command
 
-def ask_gpt_to_fix_command(command):
+def ask_gpt_to_fix_command(command, verbose = False):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {os.environ['FLEM_OPENAI_API_KEY']}"
     }
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4o-mini",
         "messages": [
-            {"role": "system", "content": "You are a helpful assistant that fixes bash commands. Provide only the fixed command without any additional explanation."},
+            {"role": "system", "content": "You are a helpful assistant that fixes bash commands. Provide only the fixed command without any additional explanation. Don't use markdown."},
             {"role": "user", "content": f"Fix this bash command: {command}"}
         ],
         "max_tokens": len(command) + 20,
@@ -51,6 +51,11 @@ def ask_gpt_to_fix_command(command):
     try:
         with urllib.request.urlopen(req) as response:
             result = json.loads(response.read().decode('utf-8'))
+            if verbose:
+                price_input = 0.15 / 1_000_000 # $
+                price_output = 0.6 / 1_000_000 # $
+                total_cost = price_input * result['usage']['prompt_tokens'] + price_output * result['usage']['completion_tokens']
+                maybe_print(verbose=verbose, message=f"Consumed: {result['usage']['prompt_tokens']}+{result['usage']['completion_tokens']} tokens ~= ${total_cost:.8f}")
             return result['choices'][0]['message']['content'].strip()
     except urllib.error.URLError as e:
         print(f"Error making request to OpenAI API: {e}")
@@ -87,7 +92,7 @@ def main(verbose = False):
 
     print(f"Last command found: {last_command}")
     vprint("Asking GPT to fix the command...")
-    fixed_command = ask_gpt_to_fix_command(last_command)
+    fixed_command = ask_gpt_to_fix_command(last_command, verbose)
     
     if fixed_command:
         vprint("GPT suggested a fix.")
