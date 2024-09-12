@@ -27,19 +27,8 @@ import argparse
 
 
 def get_last_command_from_history():
-    co = subprocess.Popen(['/bin/bash', '-c', 'history', '3'], stdout=subprocess.PIPE, text=True)
-    output, _ = co.communicate()
-    print(output)
-    return ""
-
-    
-    
-    
-    # os.system("bash -c 'history -w'") # force write history (holded in memory by bash) onto the disk
-    result = subprocess.run(['tail', '-n', '3', os.path.expanduser('~/.bash_history')], capture_output=True, text=True, shell=False)
-    print(result.stdout.strip().split(None))
-    return ""
-    return result.stdout.strip().split(None, 1)[1] if result.stdout.strip() else None
+    last_command = subprocess.getoutput('tail -n 3 ~/.bash_history | head -n 1 ').strip()
+    return last_command
 
 def ask_gpt_to_fix_command(command):
     url = "https://api.openai.com/v1/chat/completions"
@@ -103,7 +92,7 @@ def main(verbose = False):
     if fixed_command:
         vprint("GPT suggested a fix.")
         vprint(f"Original command: {last_command}")
-        print(f"Fixed command: \033[1m{fixed_command}\033[0m   [\033[1;32mE]nter\033[0m \033[1;31m[C]ancel\033[0m")
+        print(f"\033[1m{fixed_command}\033[0m   [\033[1;32mE]nter\033[0m \033[1;31m[C]ancel\033[0m")
         user_input = input("")
         
         if user_input in ["", "e", "E"]:
@@ -142,5 +131,4 @@ def cli():
     main(verbose=args.verbose)
 
 if __name__ == "__main__":
-    # cli()
-    print(get_last_command_from_history())
+    cli()
