@@ -26,6 +26,12 @@ Run the script with:
 ``` sh
 python flem.py [options]
 ```
+It's recommended to define an alias instead:
+``` sh
+alias flem='history -w;python3 /path/to/flem.py'
+```
+
+
 Options:
 - `-v`, `--verbose`: Enable verbose output
 - `-h`, `--help`: Show the help message and exit
